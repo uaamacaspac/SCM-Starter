@@ -11,6 +11,7 @@ export default function HomePage() {
   const [withdrawAmount, setWithdrawAmount] = useState(0);
   const [transferAmount, setTransferAmount] = useState(0);
   const [transferAddress, setTransferAddress] = useState("");
+  const [transferStatus, setTransferStatus] = useState("");
 
   const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   const atmABI = atm_abi.abi;
@@ -80,9 +81,15 @@ export default function HomePage() {
 
   const transferFunds = async () => {
     if (atm) {
-      let tx = await atm.transferFunds(transferAddress, transferAmount);
-      await tx.wait();
-      getBalance();
+      try {
+        let tx = await atm.transferFunds(transferAddress, transferAmount);
+        await tx.wait();
+        getBalance();
+        setTransferStatus(`${transferAmount} ETH has been transferred to ${transferAddress}.`);
+      } catch (error) {
+        console.error("Transfer error:", error);
+        setTransferStatus("Transfer failed. Please try again.");
+      }
     }
   };
 
@@ -106,7 +113,7 @@ export default function HomePage() {
     return (
       <div>
         <p>Your Account: {account}</p>
-        <p>Your Balance: {balance}</p>
+        <p>Your Balance: {balance} ETH</p>
         <div>
           <input
             type="number"
@@ -150,6 +157,9 @@ export default function HomePage() {
         <h1>Welcome to my ATM!</h1>
       </header>
       {initUser()}
+      <div>
+        {transferStatus && <p>{transferStatus}</p>}
+      </div>
       <style jsx>{`
         .container {
           text-align: center;

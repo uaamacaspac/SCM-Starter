@@ -37,7 +37,7 @@ contract Assessment {
     }
 
     // custom error
-    error InsufficientBalance(uint256 balance, uint256 withdrawAmount);
+    error InsufficientBalance(uint256 balance, uint256 amount);
 
     function withdraw(uint256 _withdrawAmount) public {
         require(msg.sender == owner, "You are not the owner of this account");
@@ -45,7 +45,7 @@ contract Assessment {
         if (balance < _withdrawAmount) {
             revert InsufficientBalance({
                 balance: balance,
-                withdrawAmount: _withdrawAmount
+                amount: _withdrawAmount
             });
         }
 
@@ -65,13 +65,13 @@ contract Assessment {
         if (balance < _amount) {
             revert InsufficientBalance({
                 balance: balance,
-                withdrawAmount: _amount
+                amount: _amount
             });
         }
 
         // transfer the given amount
         balance -= _amount;
-        _to.transfer(_amount);
+        // _to.transfer(_amount);
 
         // assert the balance is correct
         assert(balance == (_previousBalance - _amount));
