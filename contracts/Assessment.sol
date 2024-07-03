@@ -9,13 +9,14 @@ contract Assessment {
 
     event Deposit(uint256 amount);
     event Withdraw(uint256 amount);
+    event Transferred(address to, uint256 amount);
 
     constructor(uint initBalance) payable {
         owner = payable(msg.sender);
         balance = initBalance;
     }
 
-    function getBalance() public view returns(uint256){
+    function getBalance() public view returns (uint256) {
         return balance;
     }
 
@@ -56,5 +57,26 @@ contract Assessment {
 
         // emit the event
         emit Withdraw(_withdrawAmount);
+    }
+
+    function transferFunds(address payable _to, uint256 _amount) public {
+        require(msg.sender == owner, "You are not the owner of this account");
+        uint _previousBalance = balance;
+        if (balance < _amount) {
+            revert InsufficientBalance({
+                balance: balance,
+                withdrawAmount: _amount
+            });
+        }
+
+        // transfer the given amount
+        balance -= _amount;
+        _to.transfer(_amount);
+
+        // assert the balance is correct
+        assert(balance == (_previousBalance - _amount));
+
+        // emit the event
+        emit Transferred(_to, _amount);
     }
 }
